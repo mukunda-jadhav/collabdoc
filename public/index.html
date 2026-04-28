@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>CollabDocs</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="/css/style.css"/>
+</head>
+<body class="bg-gray-50 text-gray-900 min-h-screen" style="font-family:'Inter',sans-serif">
+
+<!-- ══════════════════════════════════════
+     AUTH SCREEN
+══════════════════════════════════════ -->
+<div id="auth-screen" class="min-h-screen flex flex-col items-center justify-center px-4 py-12 bg-gray-50">
+  <div class="mb-8 text-center">
+    <div class="inline-flex items-center gap-2.5 mb-2">
+      <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M4 4h16v2H4V4zm0 4h10v2H4V8zm0 4h16v2H4v-2zm0 4h10v2H4v-2z" fill="white"/></svg>
+      </div>
+      <span class="text-xl font-bold text-gray-900 tracking-tight">CollabDocs</span>
+    </div>
+    <p class="text-sm text-gray-500">Real-time collaborative editing — secured by room codes</p>
+  </div>
+
+  <div class="w-full max-w-md bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+    <div class="flex border-b border-gray-200">
+      <button id="tab-create" onclick="switchTab('create')"
+        class="flex-1 py-3.5 text-sm font-medium transition-all text-blue-600 border-b-2 border-blue-600 bg-blue-50/50">
+        Create Room
+      </button>
+      <button id="tab-join" onclick="switchTab('join')"
+        class="flex-1 py-3.5 text-sm font-medium transition-all text-gray-500 border-b-2 border-transparent hover:text-gray-900">
+        Join Room
+      </button>
+    </div>
+
+    <!-- Create -->
+    <div id="create-tab" class="p-6 space-y-4">
+      <div>
+        <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Your Name</label>
+        <input id="c-name" type="text" placeholder="e.g. Alice" maxlength="24"
+          class="w-full border border-gray-300 rounded-xl px-3.5 py-2.5 text-sm text-gray-900 placeholder-gray-400 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all"/>
+      </div>
+      <div>
+        <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Document Title</label>
+        <input id="c-title" type="text" placeholder="e.g. Project Roadmap" maxlength="60"
+          class="w-full border border-gray-300 rounded-xl px-3.5 py-2.5 text-sm text-gray-900 placeholder-gray-400 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all"/>
+      </div>
+      <div>
+        <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Access Code</label>
+        <input id="c-code" type="password" placeholder="Min 4 characters" maxlength="32"
+          class="w-full border border-gray-300 rounded-xl px-3.5 py-2.5 text-sm text-gray-900 placeholder-gray-400 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all" style="font-family:'JetBrains Mono',monospace"/>
+        <p class="text-xs text-gray-400 mt-1">Share with collaborators. Stored encrypted.</p>
+      </div>
+      <button onclick="createRoom()"
+        class="w-full py-2.5 rounded-xl bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 active:scale-[0.98] transition-all shadow-sm">
+        Create Room
+      </button>
+      <p id="c-error" class="text-xs text-red-500 text-center hidden"></p>
+    </div>
+
+    <!-- Join -->
+    <div id="join-tab" class="p-6 space-y-4 hidden">
+      <div>
+        <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Your Name</label>
+        <input id="j-name" type="text" placeholder="e.g. Bob" maxlength="24"
+          class="w-full border border-gray-300 rounded-xl px-3.5 py-2.5 text-sm text-gray-900 placeholder-gray-400 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all"/>
+      </div>
+      <div>
+        <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Room ID</label>
+        <input id="j-room" type="text" placeholder="e.g. AB3XYZ7K" maxlength="20"
+          class="w-full border border-gray-300 rounded-xl px-3.5 py-2.5 text-sm text-gray-900 placeholder-gray-400 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all uppercase" style="font-family:'JetBrains Mono',monospace"/>
+      </div>
+      <div>
+        <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Access Code</label>
+        <input id="j-code" type="password" placeholder="Enter the secret code" maxlength="32"
+          class="w-full border border-gray-300 rounded-xl px-3.5 py-2.5 text-sm text-gray-900 placeholder-gray-400 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all" style="font-family:'JetBrains Mono',monospace"/>
+      </div>
+      <button onclick="joinRoom()"
+        class="w-full py-2.5 rounded-xl bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 active:scale-[0.98] transition-all shadow-sm">
+        Join Room
+      </button>
+      <p id="j-error" class="text-xs text-red-500 text-center hidden"></p>
+    </div>
+  </div>
+  <p class="mt-5 text-xs text-gray-400">Only users with the correct Room ID + access code can edit.</p>
+</div>
+
+<!-- ══════════════════════════════════════
+     EDITOR SCREEN
+══════════════════════════════════════ -->
+<div id="editor-screen" class="hidden h-screen flex flex-col bg-white">
+
+  <!-- Toolbar -->
+  <header id="toolbar" class="flex items-center gap-1.5 px-3 py-1.5 bg-white border-b border-gray-200 flex-shrink-0">
+
+    <!-- Brand -->
+    <div class="w-6 h-6 rounded bg-blue-600 flex items-center justify-center flex-shrink-0">
+      <svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M4 4h16v2H4V4zm0 4h10v2H4V8zm0 4h16v2H4v-2zm0 4h10v2H4v-2z" fill="white"/></svg>
+    </div>
+    <span id="doc-title" class="text-sm font-semibold text-gray-800 max-w-[120px] truncate flex-shrink-0">Untitled</span>
+
+    <!-- Room badge -->
+    <div class="flex items-center gap-1 bg-blue-50 border border-blue-200 rounded-md px-2 py-0.5 flex-shrink-0">
+      <span class="text-xs text-blue-400">Room</span>
+      <span id="room-badge" class="text-xs font-bold text-blue-700" style="font-family:'JetBrains Mono',monospace">—</span>
+      <button onclick="copyRoomId()" class="text-blue-300 hover:text-blue-600 ml-0.5">
+        <svg width="10" height="10" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+      </button>
+    </div>
+
+    <div class="h-4 w-px bg-gray-200 flex-shrink-0 mx-0.5"></div>
+
+    <!-- Text formatting -->
+    <div class="flex items-center gap-0.5 flex-shrink-0">
+      <button onclick="fmt('bold')"         class="tb-btn font-bold">B</button>
+      <button onclick="fmt('italic')"       class="tb-btn italic">I</button>
+      <button onclick="fmt('underline')"    class="tb-btn underline">U</button>
+      <button onclick="fmt('strikeThrough')"class="tb-btn line-through">S</button>
+      <div class="h-4 w-px bg-gray-200 mx-0.5"></div>
+      <button onclick="fmt('h1')" class="tb-btn text-xs font-semibold">H1</button>
+      <button onclick="fmt('h2')" class="tb-btn text-xs font-semibold">H2</button>
+      <button onclick="fmt('h3')" class="tb-btn text-xs font-semibold">H3</button>
+      <div class="h-4 w-px bg-gray-200 mx-0.5"></div>
+      <button onclick="fmt('ul')" class="tb-btn text-xs">• List</button>
+      <button onclick="fmt('ol')" class="tb-btn text-xs">1. List</button>
+      <div class="h-4 w-px bg-gray-200 mx-0.5"></div>
+      <select onchange="setFontSize(this.value);this.value=''"
+        class="h-6 text-xs border border-gray-300 rounded px-1 outline-none cursor-pointer text-gray-700 bg-white">
+        <option value="">Sz</option>
+        <option value="1">10</option><option value="2">13</option><option value="3">16</option>
+        <option value="4">18</option><option value="5">24</option><option value="6">32</option><option value="7">48</option>
+      </select>
+      <input type="color" title="Text color" onchange="setTextColor(this.value)"
+        class="w-6 h-6 rounded cursor-pointer border border-gray-300 p-0" value="#1a1a1a"/>
+      <input type="color" title="Highlight" onchange="setHighlight(this.value)"
+        class="w-6 h-6 rounded cursor-pointer border border-gray-300 p-0" value="#fde68a" style="background:#fde68a"/>
+      <div class="h-4 w-px bg-gray-200 mx-0.5"></div>
+      <button onclick="document.execCommand('undo')" class="tb-btn">↩</button>
+      <button onclick="document.execCommand('redo')" class="tb-btn">↪</button>
+    </div>
+
+    <div class="h-4 w-px bg-gray-200 flex-shrink-0 mx-0.5"></div>
+
+    <!-- Insert trigger -->
+    <button id="insert-trigger" onclick="toggleMenu('insert-menu',this)"
+      class="tb-btn flex items-center gap-1 flex-shrink-0 !text-violet-600 !border-violet-200 hover:!bg-violet-50">
+      <svg width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+      Insert
+      <svg width="8" height="8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+    </button>
+
+    <!-- Export trigger -->
+    <button id="export-trigger" onclick="toggleMenu('download-menu',this)"
+      class="tb-btn flex items-center gap-1 flex-shrink-0 !text-emerald-600 !border-emerald-200 hover:!bg-emerald-50">
+      <svg width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 3v13M7 11l5 5 5-5M4 20h16"/></svg>
+      Export
+      <svg width="8" height="8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+    </button>
+
+    <!-- Right side -->
+    <div class="ml-auto flex items-center gap-2 flex-shrink-0">
+      <span id="typing-indicator" class="text-xs text-gray-400 italic hidden"></span>
+      <div id="users-bar" class="flex items-center gap-1"></div>
+      <div class="flex items-center gap-1">
+        <div id="conn-dot" class="w-2 h-2 rounded-full bg-emerald-500"></div>
+        <span id="conn-text" class="text-xs text-gray-400">Live</span>
+      </div>
+      <button onclick="leaveRoom()"
+        class="text-xs px-2.5 py-1 rounded-lg border border-gray-200 text-gray-500 hover:border-red-300 hover:text-red-500 transition-colors">
+        Leave
+      </button>
+    </div>
+  </header>
+
+  <!-- Body -->
+  <div class="flex flex-1 overflow-hidden">
+
+    <!-- Editor canvas -->
+    <div class="flex-1 overflow-y-auto bg-gray-50">
+      <!-- A4-like white page -->
+      <div class="max-w-3xl mx-auto my-8 bg-white shadow-sm border border-gray-200 rounded-lg px-12 py-10 min-h-[calc(100vh-8rem)]">
+        <div id="editor" contenteditable="true"
+          data-placeholder="Start writing your document…"
+          class="doc-editor outline-none min-h-[60vh]">
+        </div>
+      </div>
+    </div>
+
+    <!-- Sidebar -->
+    <aside class="w-56 bg-white border-l border-gray-200 flex flex-col flex-shrink-0 overflow-hidden">
+      <div class="px-4 pt-4 pb-3 border-b border-gray-100">
+        <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-3">Collaborators</p>
+        <div id="collab-list" class="space-y-2"></div>
+      </div>
+      <div class="px-4 pt-3 flex-1 overflow-y-auto">
+        <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-3">Activity</p>
+        <div id="activity-log" class="space-y-2"></div>
+      </div>
+    </aside>
+  </div>
+
+  <!-- Status bar -->
+  <footer class="flex items-center gap-4 px-4 py-1 bg-white border-t border-gray-200 text-xs text-gray-400 flex-shrink-0">
+    <span id="word-count">0 words</span>
+    <span id="char-count">0 chars</span>
+    <div class="ml-auto flex items-center gap-1.5">
+      <span id="save-dot" class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+      <span id="save-text">Saved</span>
+    </div>
+  </footer>
+</div>
+
+<!-- Chart edit modal -->
+<div id="chart-modal" class="fixed inset-0 bg-black/40 flex items-center justify-center z-[200] hidden">
+  <div class="bg-white border border-gray-200 rounded-2xl p-6 w-96 shadow-xl">
+    <h3 class="text-sm font-semibold text-gray-800 mb-4">Edit Chart Data</h3>
+    <div class="space-y-3 mb-4">
+      <div>
+        <label class="text-xs text-gray-500 block mb-1">Chart Title</label>
+        <input id="chart-edit-title" type="text" placeholder="My Chart"
+          class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-500"/>
+      </div>
+      <div>
+        <label class="text-xs text-gray-500 block mb-1">Labels (comma separated)</label>
+        <input id="chart-edit-labels" type="text" placeholder="Jan, Feb, Mar"
+          class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-500"/>
+      </div>
+      <div>
+        <label class="text-xs text-gray-500 block mb-1">Values (comma separated)</label>
+        <input id="chart-edit-values" type="text" placeholder="10, 20, 30"
+          class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-500"/>
+      </div>
+      <div>
+        <label class="text-xs text-gray-500 block mb-1">Color</label>
+        <input id="chart-edit-color" type="color" value="#3b82f6" class="w-10 h-8 border border-gray-300 rounded cursor-pointer"/>
+      </div>
+    </div>
+    <div class="flex gap-2">
+      <button onclick="applyChartEdit()"
+        class="flex-1 py-2 rounded-lg bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700">Apply</button>
+      <button onclick="document.getElementById('chart-modal').classList.add('hidden')"
+        class="flex-1 py-2 rounded-lg border border-gray-200 text-gray-600 text-sm hover:bg-gray-50">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Table modal -->
+<div id="table-modal" class="fixed inset-0 bg-black/40 flex items-center justify-center z-[200] hidden">
+  <div class="bg-white border border-gray-200 rounded-2xl p-6 w-72 shadow-xl">
+    <h3 class="text-sm font-semibold text-gray-800 mb-4">Custom Table</h3>
+    <div class="space-y-3 mb-5">
+      <div>
+        <label class="text-xs text-gray-500 block mb-1">Rows (1–20)</label>
+        <input id="tbl-rows" type="number" min="1" max="20" value="3"
+          class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-500"/>
+      </div>
+      <div>
+        <label class="text-xs text-gray-500 block mb-1">Columns (1–10)</label>
+        <input id="tbl-cols" type="number" min="1" max="10" value="3"
+          class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-500"/>
+      </div>
+    </div>
+    <div class="flex gap-2">
+      <button onclick="insertCustomTable()"
+        class="flex-1 py-2 rounded-lg bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700">Insert</button>
+      <button onclick="document.getElementById('table-modal').classList.add('hidden')"
+        class="flex-1 py-2 rounded-lg border border-gray-200 text-gray-600 text-sm">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Hidden file input -->
+<input type="file" id="img-upload" accept="image/*" class="hidden" onchange="handleImageUpload(event)"/>
+
+<!-- Toast -->
+<div id="toast" class="fixed bottom-5 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-sm px-5 py-2.5 rounded-xl shadow-lg z-[300] opacity-0 pointer-events-none transition-all duration-300 translate-y-2 whitespace-nowrap"></div>
+
+<!-- Loading -->
+<div id="loading-overlay" class="fixed inset-0 bg-white/80 flex flex-col items-center justify-center z-[400] hidden">
+  <div class="w-7 h-7 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mb-3"></div>
+  <span id="loading-text" class="text-sm text-gray-500">Loading…</span>
+</div>
+
+<!-- ══ PORTAL MENUS (fixed, outside any overflow parent) ══ -->
+
+<!-- Insert menu -->
+<div id="insert-menu" class="portal-menu hidden">
+  <div class="menu-section">Tables</div>
+  <button class="menu-item" onclick="insertTable(2,2);closeMenus()">2 × 2 Table</button>
+  <button class="menu-item" onclick="insertTable(3,3);closeMenus()">3 × 3 Table</button>
+  <button class="menu-item" onclick="insertTable(4,4);closeMenus()">4 × 4 Table</button>
+  <button class="menu-item" onclick="showCustomTable()">Custom size…</button>
+  <div class="menu-section">Shapes</div>
+  <button class="menu-item" onclick="insertShape('rect');closeMenus()">▭ Rectangle</button>
+  <button class="menu-item" onclick="insertShape('circle');closeMenus()">● Circle</button>
+  <button class="menu-item" onclick="insertShape('triangle');closeMenus()">▲ Triangle</button>
+  <button class="menu-item" onclick="insertShape('star');closeMenus()">★ Star</button>
+  <button class="menu-item" onclick="insertShape('arrow');closeMenus()">➜ Arrow</button>
+  <button class="menu-item" onclick="insertShape('callout');closeMenus()">💬 Callout box</button>
+  <div class="menu-section">Charts</div>
+  <button class="menu-item" onclick="insertChart('bar');closeMenus()">📊 Bar chart</button>
+  <button class="menu-item" onclick="insertChart('line');closeMenus()">📈 Line chart</button>
+  <button class="menu-item" onclick="insertChart('pie');closeMenus()">🥧 Pie chart</button>
+  <button class="menu-item" onclick="insertChart('doughnut');closeMenus()">🍩 Doughnut chart</button>
+  <div class="menu-section">Media</div>
+  <button class="menu-item" onclick="triggerImageUpload();closeMenus()">🖼 Upload image / logo</button>
+  <button class="menu-item" onclick="insertImageUrl();closeMenus()">🔗 Image from URL</button>
+  <button class="menu-item" onclick="insertDivider();closeMenus()">── Divider line</button>
+  <button class="menu-item" onclick="insertQuote();closeMenus()">❝ Blockquote</button>
+  <button class="menu-item" onclick="insertCodeBlock();closeMenus()">{ } Code block</button>
+</div>
+
+<!-- Export menu -->
+<div id="download-menu" class="portal-menu hidden" style="min-width:180px">
+  <div class="menu-section">Download as</div>
+  <button class="menu-item" onclick="downloadAs('html');closeMenus()">
+    <span class="badge badge-orange">H</span> HTML file
+  </button>
+  <button class="menu-item" onclick="downloadAs('txt');closeMenus()">
+    <span class="badge badge-gray">T</span> Plain text (.txt)
+  </button>
+  <button class="menu-item" onclick="downloadAs('md');closeMenus()">
+    <span class="badge badge-purple">M</span> Markdown (.md)
+  </button>
+  <button class="menu-item" onclick="downloadAs('pdf');closeMenus()">
+    <span class="badge badge-blue">P</span> Print / PDF
+  </button>
+  <div class="menu-section">Share</div>
+  <button class="menu-item" onclick="copyShareLink();closeMenus()">🔗 Copy share link</button>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="/js/app.js"></script>
+</body>
+</html>
