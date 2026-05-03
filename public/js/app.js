@@ -7,7 +7,7 @@ const state = {
   version: 0, lastContent: '',
   activeUsers: {}, saveTimer: null, typingTimer: null,
   isRemoteUpdate: false, savedRange: null,
-  editingChartId: null   // which chart is being edited in the modal
+  editingChartId: null 
 };
 
 /* ═══════════════════════════════════════════════════
@@ -15,7 +15,7 @@ const state = {
 ═══════════════════════════════════════════════════ */
 const socket = io();
 
-socket.on('connect',    () => setConn(true));
+socket.on('connect',     () => setConn(true));
 socket.on('disconnect', () => setConn(false));
 
 socket.on('room:state', ({ content, version, activeUsers, activity, title }) => {
@@ -44,7 +44,7 @@ socket.on('doc:update', ({ content, version, userId }) => {
 socket.on('users:update',    u  => renderUsers(u));
 socket.on('activity:update', a  => renderActivity(a));
 socket.on('user:joined', ({ name }) => toast(`${name} joined`));
-socket.on('user:left',   ({ userId }) => { delete state.activeUsers[userId]; renderUsersBar(); });
+socket.on('user:left',    ({ userId }) => { delete state.activeUsers[userId]; renderUsersBar(); });
 socket.on('user:typing', ({ name }) => {
   const el = document.getElementById('typing-indicator');
   el.textContent = `${name} is typing…`; el.classList.remove('hidden');
@@ -180,11 +180,11 @@ function insertCustomTable() {
    INSERT — SHAPES
 ═══════════════════════════════════════════════════ */
 const SHAPES = {
-  rect:    `<svg width="200" height="90" viewBox="0 0 200 90" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="4" width="192" height="82" rx="8" fill="#dbeafe" stroke="#3b82f6" stroke-width="2"/><text x="100" y="50" text-anchor="middle" fill="#1d4ed8" font-size="14" font-family="Inter,sans-serif">Rectangle</text></svg>`,
-  circle:  `<svg width="140" height="140" viewBox="0 0 140 140" xmlns="http://www.w3.org/2000/svg"><circle cx="70" cy="70" r="65" fill="#ede9fe" stroke="#7c3aed" stroke-width="2"/><text x="70" y="76" text-anchor="middle" fill="#5b21b6" font-size="14" font-family="Inter,sans-serif">Circle</text></svg>`,
+  rect:     `<svg width="200" height="90" viewBox="0 0 200 90" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="4" width="192" height="82" rx="8" fill="#dbeafe" stroke="#3b82f6" stroke-width="2"/><text x="100" y="50" text-anchor="middle" fill="#1d4ed8" font-size="14" font-family="Inter,sans-serif">Rectangle</text></svg>`,
+  circle:   `<svg width="140" height="140" viewBox="0 0 140 140" xmlns="http://www.w3.org/2000/svg"><circle cx="70" cy="70" r="65" fill="#ede9fe" stroke="#7c3aed" stroke-width="2"/><text x="70" y="76" text-anchor="middle" fill="#5b21b6" font-size="14" font-family="Inter,sans-serif">Circle</text></svg>`,
   triangle:`<svg width="170" height="150" viewBox="0 0 170 150" xmlns="http://www.w3.org/2000/svg"><polygon points="85,8 165,142 5,142" fill="#d1fae5" stroke="#10b981" stroke-width="2"/><text x="85" y="120" text-anchor="middle" fill="#065f46" font-size="14" font-family="Inter,sans-serif">Triangle</text></svg>`,
-  star:    `<svg width="150" height="150" viewBox="0 0 150 150" xmlns="http://www.w3.org/2000/svg"><polygon points="75,8 90,55 140,55 100,82 115,135 75,105 35,135 50,82 10,55 60,55" fill="#fef9c3" stroke="#eab308" stroke-width="2"/><text x="75" y="80" text-anchor="middle" fill="#713f12" font-size="12" font-family="Inter,sans-serif">Star</text></svg>`,
-  arrow:   `<svg width="210" height="70" viewBox="0 0 210 70" xmlns="http://www.w3.org/2000/svg"><polygon points="0,22 165,22 165,5 210,35 165,65 165,48 0,48" fill="#fee2e2" stroke="#ef4444" stroke-width="2"/><text x="90" y="40" text-anchor="middle" fill="#991b1b" font-size="13" font-family="Inter,sans-serif">Arrow</text></svg>`,
+  star:     `<svg width="150" height="150" viewBox="0 0 150 150" xmlns="http://www.w3.org/2000/svg"><polygon points="75,8 90,55 140,55 100,82 115,135 75,105 35,135 50,82 10,55 60,55" fill="#fef9c3" stroke="#eab308" stroke-width="2"/><text x="75" y="80" text-anchor="middle" fill="#713f12" font-size="12" font-family="Inter,sans-serif">Star</text></svg>`,
+  arrow:    `<svg width="210" height="70" viewBox="0 0 210 70" xmlns="http://www.w3.org/2000/svg"><polygon points="0,22 165,22 165,5 210,35 165,65 165,48 0,48" fill="#fee2e2" stroke="#ef4444" stroke-width="2"/><text x="90" y="40" text-anchor="middle" fill="#991b1b" font-size="13" font-family="Inter,sans-serif">Arrow</text></svg>`,
   callout: `<svg width="230" height="110" viewBox="0 0 230 110" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="4" width="210" height="78" rx="8" fill="#f0fdf4" stroke="#22c55e" stroke-width="1.5"/><polygon points="28,82 55,82 28,108" fill="#f0fdf4" stroke="#22c55e" stroke-width="1.5"/><text x="109" y="48" text-anchor="middle" fill="#166534" font-size="13" font-family="Inter,sans-serif">Callout text here</text></svg>`
 };
 function insertShape(type) {
@@ -195,7 +195,7 @@ function insertShape(type) {
 }
 
 /* ═══════════════════════════════════════════════════
-   INSERT — CHARTS  (editable via double-click)
+   INSERT — CHARTS (Editable via double-click)
 ═══════════════════════════════════════════════════ */
 let chartCounter = 0;
 
@@ -221,9 +221,9 @@ function insertChart(type) {
           data-values="${def.values.join(',')}"
           data-title="${def.title}"
           data-color="${def.color}">
-       <button class="chart-edit-btn" onclick="openChartEdit('${id}')">✏ Edit data</button>
-       <canvas id="${id}" width="520" height="240"></canvas>
-     </div><p><br></p>`
+        <button class="chart-edit-btn" onclick="openChartEdit('${id}')">✏ Edit data</button>
+        <canvas id="${id}" width="520" height="240"></canvas>
+      </div><p><br></p>`
   );
   setTimeout(() => renderChart(id), 60);
 }
@@ -264,6 +264,7 @@ function renderChart(id) {
       }]
     },
     options: {
+      animation: false, // CRITICAL: Disabled so chart is fully rendered immediately for PDF
       responsive: false,
       plugins: {
         legend: { labels: { color:'#374151', font:{ family:'Inter' } } },
@@ -286,7 +287,6 @@ function rehydrateCharts() {
   }, 80);
 }
 
-// Open chart edit modal
 function openChartEdit(id) {
   const canvas = document.getElementById(id);
   if (!canvas) return;
@@ -309,7 +309,7 @@ function applyChartEdit() {
   wrap.dataset.color  = document.getElementById('chart-edit-color').value;
   document.getElementById('chart-modal').classList.add('hidden');
   renderChart(id);
-  onInput(); // sync updated HTML to collaborators
+  onInput(); 
 }
 
 /* ═══════════════════════════════════════════════════
@@ -336,10 +336,9 @@ function insertQuote()     { insertHTML('<blockquote>Quote text here…</blockqu
 function insertCodeBlock() { insertHTML('<pre>// Code here\nconsole.log("Hello!");</pre><p><br></p>'); }
 
 /* ═══════════════════════════════════════════════════
-   EXPORT — reads ONLY from #editor, no extra text
+   EXPORT — PDF FIX INCLUDED
 ═══════════════════════════════════════════════════ */
 function downloadAs(format) {
-  // Capture ONLY the editor's innerHTML/innerText — nothing else
   const ed    = getEd();
   const html  = ed.innerHTML.trim();
   const plain = ed.innerText.trim();
@@ -381,11 +380,10 @@ td{padding:7px 12px;border:1px solid #e5e7eb}
 img{max-width:100%;height:auto;border-radius:6px;margin:.6em 0;display:block}
 hr{border:none;border-top:1px solid #e5e7eb;margin:1.4em 0}
 .doc-shape-wrap{text-align:center;margin:1em 0}
-.doc-chart-wrap{border:1px solid #e5e7eb;border-radius:8px;padding:12px;margin:1em 0}
+.doc-chart-wrap{border:1px solid #e5e7eb;border-radius:8px;padding:12px;margin:1em 0; text-align:center;}
 .chart-edit-btn{display:none}`;
 }
 
-// HTML export — just the editor content, properly wrapped
 function exportHTML(title, content) {
   const out = `<!DOCTYPE html>
 <html lang="en">
@@ -401,27 +399,25 @@ ${content}
   blobDownload(safeName(title)+'.html','text/html;charset=utf-8', out);
 }
 
-// Plain text — just editor innerText, no additions
 function exportTXT(title, plain) {
   blobDownload(safeName(title)+'.txt','text/plain;charset=utf-8', plain);
 }
 
-// Markdown — convert HTML to MD, no phantom header
 function exportMD(title, html) {
   let md = html
-    .replace(/<h1[^>]*>([\s\S]*?)<\/h1>/gi,        (_,t)=>`# ${stripT(t)}\n\n`)
-    .replace(/<h2[^>]*>([\s\S]*?)<\/h2>/gi,        (_,t)=>`## ${stripT(t)}\n\n`)
-    .replace(/<h3[^>]*>([\s\S]*?)<\/h3>/gi,        (_,t)=>`### ${stripT(t)}\n\n`)
+    .replace(/<h1[^>]*>([\s\S]*?)<\/h1>/gi,         (_,t)=>`# ${stripT(t)}\n\n`)
+    .replace(/<h2[^>]*>([\s\S]*?)<\/h2>/gi,         (_,t)=>`## ${stripT(t)}\n\n`)
+    .replace(/<h3[^>]*>([\s\S]*?)<\/h3>/gi,         (_,t)=>`### ${stripT(t)}\n\n`)
     .replace(/<strong[^>]*>([\s\S]*?)<\/strong>/gi, (_,t)=>`**${stripT(t)}**`)
-    .replace(/<b[^>]*>([\s\S]*?)<\/b>/gi,          (_,t)=>`**${stripT(t)}**`)
-    .replace(/<em[^>]*>([\s\S]*?)<\/em>/gi,        (_,t)=>`_${stripT(t)}_`)
-    .replace(/<i[^>]*>([\s\S]*?)<\/i>/gi,          (_,t)=>`_${stripT(t)}_`)
-    .replace(/<u[^>]*>([\s\S]*?)<\/u>/gi,          (_,t)=>stripT(t))
+    .replace(/<b[^>]*>([\s\S]*?)<\/b>/gi,           (_,t)=>`**${stripT(t)}**`)
+    .replace(/<em[^>]*>([\s\S]*?)<\/em>/gi,         (_,t)=>`_${stripT(t)}_`)
+    .replace(/<i[^>]*>([\s\S]*?)<\/i>/gi,           (_,t)=>`_${stripT(t)}_`)
+    .replace(/<u[^>]*>([\s\S]*?)<\/u>/gi,           (_,t)=>stripT(t))
     .replace(/<a[^>]*href="([^"]*)"[^>]*>([\s\S]*?)<\/a>/gi, (_,href,t)=>`[${stripT(t)}](${href})`)
     .replace(/<img[^>]*src="([^"]*)"[^>]*alt="([^"]*)"[^>]*\/?>/gi, (_,src,alt)=>`![${alt}](${src})`)
     .replace(/<blockquote[^>]*>([\s\S]*?)<\/blockquote>/gi,   (_,t)=>`> ${stripT(t).trim()}\n\n`)
     .replace(/<pre[^>]*>([\s\S]*?)<\/pre>/gi,      (_,t)=>'```\n'+stripT(t).trim()+'\n```\n\n')
-    .replace(/<li[^>]*>([\s\S]*?)<\/li>/gi,        (_,t)=>`- ${stripT(t).trim()}\n`)
+    .replace(/<li[^>]*>([\s\S]*?)<\/li>/gi,         (_,t)=>`- ${stripT(t).trim()}\n`)
     .replace(/<ul[^>]*>|<\/ul>/gi,'\n')
     .replace(/<ol[^>]*>|<\/ol>/gi,'\n')
     .replace(/<hr\s*\/?>/gi,'\n---\n\n')
@@ -435,10 +431,37 @@ function exportMD(title, html) {
   blobDownload(safeName(title)+'.md','text/markdown;charset=utf-8', md);
 }
 
-// PDF — opens styled print window with ONLY editor content
 function exportPDF(title, content) {
+  // 1. Create a "ghost" container to process the content without affecting the editor
+  const tempDiv = document.createElement('div');
+  tempDiv.innerHTML = content;
+
+  // 2. Locate all chart wrappers in the editor's content
+  const chartWrappers = tempDiv.querySelectorAll('.doc-chart-wrap');
+  
+  chartWrappers.forEach(wrap => {
+    const id = wrap.dataset.chartId;
+    // We look for the ACTUAL canvas in the DOM to get the bitmap data
+    const realCanvas = document.getElementById(id);
+    if (realCanvas) {
+      const img = document.createElement('img');
+      img.src = realCanvas.toDataURL("image/png");
+      img.style.width = "100%";
+      img.style.height = "auto";
+      img.style.display = "block";
+      img.style.margin = "0 auto";
+      
+      // Replace the buttons/canvas inside the PDF ghost container with a standard image
+      wrap.innerHTML = '';
+      wrap.appendChild(img);
+    }
+  });
+
+  const finalContent = tempDiv.innerHTML;
+
   const win = window.open('','_blank','width=960,height=760');
   if (!win) { toast('Pop-up blocked — allow pop-ups for this site.', true); return; }
+  
   win.document.write(`<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -456,11 +479,11 @@ ${exportCSS()}
   💡 Press <kbd>Ctrl+P</kbd> (Windows) or <kbd>⌘ Cmd+P</kbd> (Mac)
   → set destination to <strong>"Save as PDF"</strong> → click Save
 </div>
-${content}
+${finalContent}
 </body>
 </html>`);
   win.document.close(); win.focus();
-  setTimeout(()=>{ try{ win.print(); }catch(e){} }, 900);
+  setTimeout(()=>{ try{ win.print(); }catch(e){} }, 1000);
 }
 
 /* ═══════════════════════════════════════════════════
@@ -475,18 +498,15 @@ function toggleMenu(menuId, triggerEl) {
   const rect  = triggerEl.getBoundingClientRect();
   const viewH = window.innerHeight;
 
-  // Always open below the trigger
   menu.style.top    = (rect.bottom + 4) + 'px';
   menu.style.bottom = '';
   menu.style.left   = rect.left + 'px';
   menu.classList.remove('hidden');
 
-  // Clamp right edge
   const mr = menu.getBoundingClientRect();
   if (mr.right > window.innerWidth - 8)
     menu.style.left = (window.innerWidth - mr.width - 8) + 'px';
 
-  // Flip upward if not enough space
   if (rect.bottom + mr.height + 8 > viewH && rect.top > mr.height + 8) {
     menu.style.top    = '';
     menu.style.bottom = (viewH - rect.top + 4) + 'px';
