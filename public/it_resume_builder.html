@@ -1,0 +1,392 @@
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap');
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{--accent:#1a56db;--accent-light:#e8f0fe;--border:0.5px solid var(--color-border-tertiary);--radius:10px}
+  body{font-family:'DM Sans',sans-serif;font-size:14px;color:var(--color-text-primary);background:transparent}
+  h2.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
+  .shell{display:grid;grid-template-columns:260px 1fr;min-height:600px;gap:0;border:var(--border);border-radius:14px;overflow:hidden;background:var(--color-background-primary)}
+  .sidebar{background:var(--color-background-secondary);border-right:var(--border);padding:16px 0;display:flex;flex-direction:column;gap:2px}
+  .sidebar-title{font-family:'DM Serif Display',serif;font-size:18px;padding:0 16px 14px;border-bottom:var(--border);margin-bottom:8px;color:var(--color-text-primary)}
+  .nav-item{display:flex;align-items:center;gap:10px;padding:9px 16px;cursor:pointer;border-radius:0;font-size:13px;color:var(--color-text-secondary);transition:background 0.15s,color 0.15s;border:none;background:none;width:100%;text-align:left}
+  .nav-item:hover{background:var(--color-background-primary);color:var(--color-text-primary)}
+  .nav-item.active{background:var(--color-background-primary);color:var(--accent);font-weight:500}
+  .nav-item .dot{width:7px;height:7px;border-radius:50%;background:var(--color-border-secondary);flex-shrink:0}
+  .nav-item.done .dot{background:#22c55e}
+  .nav-item.active .dot{background:var(--accent)}
+  .main{display:flex;flex-direction:column}
+  .topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:var(--border)}
+  .section-label{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:var(--color-text-tertiary)}
+  .section-title{font-family:'DM Serif Display',serif;font-size:20px;margin-top:2px}
+  .btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;border:var(--border);background:var(--color-background-primary);color:var(--color-text-primary);transition:all .15s}
+  .btn:hover{background:var(--color-background-secondary)}
+  .btn-primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .btn-primary:hover{background:#1648c4}
+  .form-area{padding:20px;flex:1;overflow-y:auto;max-height:520px}
+  .field-group{margin-bottom:18px}
+  .field-group label{display:block;font-size:12px;font-weight:500;color:var(--color-text-secondary);margin-bottom:5px}
+  .field-group input,.field-group textarea,.field-group select{width:100%;padding:8px 11px;border:var(--border);border-radius:8px;font-size:13px;font-family:'DM Sans',sans-serif;background:var(--color-background-primary);color:var(--color-text-primary);resize:vertical;transition:border-color .15s}
+  .field-group input:focus,.field-group textarea:focus{outline:none;border-color:var(--accent)}
+  .field-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .field-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+  .skill-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+  .skill-tag{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;font-size:12px;background:var(--accent-light);color:var(--accent);border:0.5px solid #bfcfed}
+  .skill-tag button{background:none;border:none;cursor:pointer;color:var(--accent);font-size:14px;line-height:1;padding:0}
+  .skill-input-row{display:flex;gap:8px;margin-top:6px}
+  .card-item{border:var(--border);border-radius:10px;padding:14px;margin-bottom:12px;background:var(--color-background-primary);position:relative}
+  .card-item-title{font-weight:500;font-size:13px;margin-bottom:8px;color:var(--color-text-primary)}
+  .remove-btn{position:absolute;top:10px;right:10px;background:none;border:none;cursor:pointer;font-size:16px;color:var(--color-text-tertiary);line-height:1}
+  .remove-btn:hover{color:#e24b4a}
+  .add-btn{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--accent);background:none;border:1.5px dashed #bfcfed;border-radius:8px;padding:8px 14px;cursor:pointer;width:100%;justify-content:center;margin-top:4px}
+  .add-btn:hover{background:var(--accent-light)}
+  .preview-panel{padding:20px;flex:1;overflow-y:auto;max-height:580px}
+  .resume-preview{font-family:'DM Sans',sans-serif;font-size:12px;line-height:1.5;color:#1a1a1a;background:#fff;padding:28px 32px;border:0.5px solid #ddd;border-radius:10px;min-height:500px}
+  .rp-name{font-family:'DM Serif Display',serif;font-size:26px;color:#111;margin-bottom:3px}
+  .rp-contact{font-size:11px;color:#555;display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px}
+  .rp-contact a{color:#1a56db;text-decoration:none}
+  .rp-section{margin-bottom:14px}
+  .rp-section-title{font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:#1a56db;border-bottom:1.5px solid #1a56db;padding-bottom:3px;margin-bottom:8px}
+  .rp-summary{font-size:12px;color:#333;line-height:1.6}
+  .rp-skills-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:4px}
+  .rp-skill-cat{font-size:11px;color:#444}
+  .rp-skill-cat strong{color:#222}
+  .rp-project{margin-bottom:8px}
+  .rp-project-name{font-weight:500;font-size:12px;color:#111}
+  .rp-project-tech{font-size:11px;color:#1a56db;margin-bottom:2px}
+  .rp-project-desc{font-size:11px;color:#444}
+  .rp-edu,.rp-exp,.rp-cert{margin-bottom:6px}
+  .rp-row{display:flex;justify-content:space-between;font-size:12px}
+  .rp-sub{font-size:11px;color:#555}
+  .progress-bar{height:3px;background:var(--color-border-tertiary);border-radius:2px;margin-top:12px}
+  .progress-fill{height:100%;background:var(--accent);border-radius:2px;transition:width .4s}
+  .tabs{display:flex;border-bottom:var(--border)}
+  .tab{padding:10px 18px;font-size:13px;cursor:pointer;border:none;background:none;color:var(--color-text-secondary);border-bottom:2px solid transparent;margin-bottom:-0.5px}
+  .tab.active{color:var(--accent);border-bottom-color:var(--accent);font-weight:500}
+</style>
+
+<h2 class="sr-only">IT Resume Builder — fill in your details section by section and export as PDF</h2>
+
+<div class="shell">
+  <div class="sidebar">
+    <div class="sidebar-title">Resume Builder</div>
+    <button class="nav-item active" onclick="goSection(0,this)"><span class="dot"></span>Header</button>
+    <button class="nav-item" onclick="goSection(1,this)"><span class="dot"></span>Summary</button>
+    <button class="nav-item" onclick="goSection(2,this)"><span class="dot"></span>Skills</button>
+    <button class="nav-item" onclick="goSection(3,this)"><span class="dot"></span>Projects</button>
+    <button class="nav-item" onclick="goSection(4,this)"><span class="dot"></span>Education</button>
+    <button class="nav-item" onclick="goSection(5,this)"><span class="dot"></span>Certifications</button>
+    <button class="nav-item" onclick="goSection(6,this)"><span class="dot"></span>Experience</button>
+    <div style="flex:1"></div>
+    <div style="padding:12px 16px;border-top:var(--border)">
+      <div style="font-size:11px;color:var(--color-text-tertiary);margin-bottom:4px">Completion</div>
+      <div class="progress-bar"><div class="progress-fill" id="prog" style="width:14%"></div></div>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="topbar">
+      <div>
+        <div class="section-label" id="sec-label">01 / 07</div>
+        <div class="section-title" id="sec-title">Header</div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn" onclick="showTab('form')" id="tab-form">Edit</button>
+        <button class="btn" onclick="showTab('preview')" id="tab-prev">Preview</button>
+        <button class="btn btn-primary" onclick="exportPDF()">Export PDF ↗</button>
+      </div>
+    </div>
+
+    <!-- FORM TAB -->
+    <div id="view-form" class="form-area">
+
+      <!-- SECTION 0: Header -->
+      <div id="s0">
+        <div class="field-grid">
+          <div class="field-group"><label>Full Name</label><input id="name" placeholder="Rahul Sharma" oninput="render()"></div>
+          <div class="field-group"><label>Phone Number</label><input id="phone" placeholder="+91 98765 43210" oninput="render()"></div>
+        </div>
+        <div class="field-group"><label>Professional Email</label><input id="email" placeholder="rahul.sharma@gmail.com" oninput="render()"></div>
+        <div class="field-grid">
+          <div class="field-group"><label>LinkedIn URL</label><input id="linkedin" placeholder="linkedin.com/in/rahulsharma" oninput="render()"></div>
+          <div class="field-group"><label>GitHub / Portfolio</label><input id="github" placeholder="github.com/rahulsharma" oninput="render()"></div>
+        </div>
+      </div>
+
+      <!-- SECTION 1: Summary -->
+      <div id="s1" style="display:none">
+        <div class="field-group">
+          <label>Professional Summary (2–4 lines)</label>
+          <textarea id="summary" rows="5" placeholder="Aspiring web developer with knowledge of HTML, CSS, JavaScript, and React. Passionate about building user-friendly websites and learning modern technologies." oninput="render()"></textarea>
+        </div>
+      </div>
+
+      <!-- SECTION 2: Skills -->
+      <div id="s2" style="display:none">
+        <div class="field-group">
+          <label>Languages</label>
+          <div class="skill-input-row"><input id="lang-in" placeholder="e.g. Python" style="flex:1" onkeydown="if(event.key==='Enter')addSkill('lang')"><button class="btn" onclick="addSkill('lang')">Add</button></div>
+          <div class="skill-tags" id="lang-tags"></div>
+        </div>
+        <div class="field-group">
+          <label>Web Technologies</label>
+          <div class="skill-input-row"><input id="web-in" placeholder="e.g. React" style="flex:1" onkeydown="if(event.key==='Enter')addSkill('web')"><button class="btn" onclick="addSkill('web')">Add</button></div>
+          <div class="skill-tags" id="web-tags"></div>
+        </div>
+        <div class="field-group">
+          <label>Tools & Platforms</label>
+          <div class="skill-input-row"><input id="tools-in" placeholder="e.g. Git, VS Code" style="flex:1" onkeydown="if(event.key==='Enter')addSkill('tools')"><button class="btn" onclick="addSkill('tools')">Add</button></div>
+          <div class="skill-tags" id="tools-tags"></div>
+        </div>
+        <div class="field-group">
+          <label>Other Skills</label>
+          <div class="skill-input-row"><input id="other-in" placeholder="e.g. Problem-solving" style="flex:1" onkeydown="if(event.key==='Enter')addSkill('other')"><button class="btn" onclick="addSkill('other')">Add</button></div>
+          <div class="skill-tags" id="other-tags"></div>
+        </div>
+      </div>
+
+      <!-- SECTION 3: Projects -->
+      <div id="s3" style="display:none">
+        <div id="proj-list"></div>
+        <button class="add-btn" onclick="addProject()">+ Add Project</button>
+      </div>
+
+      <!-- SECTION 4: Education -->
+      <div id="s4" style="display:none">
+        <div id="edu-list"></div>
+        <button class="add-btn" onclick="addEdu()">+ Add Education</button>
+      </div>
+
+      <!-- SECTION 5: Certifications -->
+      <div id="s5" style="display:none">
+        <div id="cert-list"></div>
+        <button class="add-btn" onclick="addCert()">+ Add Certification</button>
+      </div>
+
+      <!-- SECTION 6: Experience -->
+      <div id="s6" style="display:none">
+        <div style="font-size:12px;color:var(--color-text-secondary);margin-bottom:12px">Add internships or freelance work (optional).</div>
+        <div id="exp-list"></div>
+        <button class="add-btn" onclick="addExp()">+ Add Experience</button>
+      </div>
+
+      <div style="display:flex;justify-content:space-between;margin-top:20px">
+        <button class="btn" onclick="prevSec()" id="prev-btn" style="visibility:hidden">← Back</button>
+        <button class="btn btn-primary" onclick="nextSec()" id="next-btn">Next →</button>
+      </div>
+    </div>
+
+    <!-- PREVIEW TAB -->
+    <div id="view-preview" class="preview-panel" style="display:none">
+      <div class="resume-preview" id="resume-preview"></div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script>
+let cur=0;
+const labels=["01 / 07","02 / 07","03 / 07","04 / 07","05 / 07","06 / 07","07 / 07"];
+const titles=["Header","Summary","Skills","Projects","Education","Certifications","Experience"];
+const navItems=document.querySelectorAll('.nav-item');
+
+const skills={lang:[],web:[],tools:[],other:[]};
+const projects=[];
+const edus=[];
+const certs=[];
+const exps=[];
+
+function goSection(i,el){
+  document.getElementById('s'+cur).style.display='none';
+  cur=i;
+  document.getElementById('s'+cur).style.display='';
+  document.getElementById('sec-label').textContent=labels[i];
+  document.getElementById('sec-title').textContent=titles[i];
+  navItems.forEach((n,j)=>{n.classList.toggle('active',j===i)});
+  document.getElementById('prev-btn').style.visibility=i===0?'hidden':'visible';
+  document.getElementById('next-btn').textContent=i===6?'Done ✓':'Next →';
+  updateProgress();render();
+}
+function nextSec(){if(cur<6)goSection(cur+1,navItems[cur+1]);}
+function prevSec(){if(cur>0)goSection(cur-1,navItems[cur-1]);}
+
+function updateProgress(){
+  const filled=[
+    v('name')||v('email'),
+    v('summary'),
+    skills.lang.length||skills.web.length,
+    projects.length>0,
+    edus.length>0,
+    certs.length>0,
+    exps.length>0
+  ];
+  const pct=Math.round((filled.filter(Boolean).length/7)*100);
+  document.getElementById('prog').style.width=pct+'%';
+  navItems.forEach((n,i)=>{n.classList.toggle('done',filled[i]&&i!==cur);});
+}
+function v(id){return(document.getElementById(id)||{}).value||'';}
+
+function showTab(t){
+  document.getElementById('view-form').style.display=t==='form'?'':'none';
+  document.getElementById('view-preview').style.display=t==='preview'?'':'none';
+  if(t==='preview')render();
+}
+
+function addSkill(cat){
+  const inp=document.getElementById(cat+'-in');
+  const val=inp.value.trim();
+  if(!val)return;
+  skills[cat].push(val);
+  inp.value='';
+  renderTags(cat);render();updateProgress();
+}
+function removeSkill(cat,i){skills[cat].splice(i,1);renderTags(cat);render();updateProgress();}
+function renderTags(cat){
+  const el=document.getElementById(cat+'-tags');
+  el.innerHTML=skills[cat].map((s,i)=>`<span class="skill-tag">${s}<button onclick="removeSkill('${cat}',${i})">×</button></span>`).join('');
+}
+
+let pid=0;
+function addProject(){
+  const id='p'+pid++;
+  projects.push({id,name:'',tech:'',desc:'',contribution:''});
+  renderProjects();
+}
+function removeProject(id){const i=projects.findIndex(p=>p.id===id);if(i>-1)projects.splice(i,1);renderProjects();render();updateProgress();}
+function renderProjects(){
+  document.getElementById('proj-list').innerHTML=projects.map(p=>`
+    <div class="card-item">
+      <button class="remove-btn" onclick="removeProject('${p.id}')">×</button>
+      <div class="field-grid">
+        <div class="field-group"><label>Project Name</label><input value="${p.name}" placeholder="Online Quiz App" oninput="projects.find(x=>x.id==='${p.id}').name=this.value;render()"></div>
+        <div class="field-group"><label>Tech Used</label><input value="${p.tech}" placeholder="HTML, CSS, JS" oninput="projects.find(x=>x.id==='${p.id}').tech=this.value;render()"></div>
+      </div>
+      <div class="field-group"><label>What it does</label><input value="${p.desc}" placeholder="Quiz system with timer and score tracking" oninput="projects.find(x=>x.id==='${p.id}').desc=this.value;render()"></div>
+      <div class="field-group"><label>Your Contribution</label><input value="${p.contribution}" placeholder="Built the timer logic and UI layout" oninput="projects.find(x=>x.id==='${p.id}').contribution=this.value;render()"></div>
+    </div>`).join('');
+  updateProgress();
+}
+
+let eid=0;
+function addEdu(){
+  const id='e'+eid++;
+  edus.push({id,degree:'',college:'',year:'',score:''});
+  renderEdus();
+}
+function removeEdu(id){const i=edus.findIndex(e=>e.id===id);if(i>-1)edus.splice(i,1);renderEdus();render();updateProgress();}
+function renderEdus(){
+  document.getElementById('edu-list').innerHTML=edus.map(e=>`
+    <div class="card-item">
+      <button class="remove-btn" onclick="removeEdu('${e.id}')">×</button>
+      <div class="field-grid">
+        <div class="field-group"><label>Degree</label><input value="${e.degree}" placeholder="B.Tech Computer Science" oninput="edus.find(x=>x.id==='${e.id}').degree=this.value;render()"></div>
+        <div class="field-group"><label>College Name</label><input value="${e.college}" placeholder="XYZ University" oninput="edus.find(x=>x.id==='${e.id}').college=this.value;render()"></div>
+      </div>
+      <div class="field-grid">
+        <div class="field-group"><label>Year</label><input value="${e.year}" placeholder="2022 – 2026" oninput="edus.find(x=>x.id==='${e.id}').year=this.value;render()"></div>
+        <div class="field-group"><label>CGPA / Percentage</label><input value="${e.score}" placeholder="8.5 CGPA" oninput="edus.find(x=>x.id==='${e.id}').score=this.value;render()"></div>
+      </div>
+    </div>`).join('');
+  updateProgress();
+}
+
+let cid=0;
+function addCert(){
+  const id='c'+cid++;
+  certs.push({id,name:'',platform:'',year:''});
+  renderCerts();
+}
+function removeCert(id){const i=certs.findIndex(c=>c.id===id);if(i>-1)certs.splice(i,1);renderCerts();render();updateProgress();}
+function renderCerts(){
+  document.getElementById('cert-list').innerHTML=certs.map(c=>`
+    <div class="card-item">
+      <button class="remove-btn" onclick="removeCert('${c.id}')">×</button>
+      <div class="field-grid">
+        <div class="field-group"><label>Certification Name</label><input value="${c.name}" placeholder="Python for Beginners" oninput="certs.find(x=>x.id==='${c.id}').name=this.value;render()"></div>
+        <div class="field-group"><label>Platform / Issuer</label><input value="${c.platform}" placeholder="Coursera" oninput="certs.find(x=>x.id==='${c.id}').platform=this.value;render()"></div>
+      </div>
+      <div class="field-group"><label>Year</label><input value="${c.year}" placeholder="2024" oninput="certs.find(x=>x.id==='${c.id}').year=this.value;render()"></div>
+    </div>`).join('');
+  updateProgress();
+}
+
+let xid=0;
+function addExp(){
+  const id='x'+xid++;
+  exps.push({id,role:'',company:'',duration:'',desc:''});
+  renderExps();
+}
+function removeExp(id){const i=exps.findIndex(e=>e.id===id);if(i>-1)exps.splice(i,1);renderExps();render();updateProgress();}
+function renderExps(){
+  document.getElementById('exp-list').innerHTML=exps.map(e=>`
+    <div class="card-item">
+      <button class="remove-btn" onclick="removeExp('${e.id}')">×</button>
+      <div class="field-grid">
+        <div class="field-group"><label>Role / Title</label><input value="${e.role}" placeholder="Frontend Intern" oninput="exps.find(x=>x.id==='${e.id}').role=this.value;render()"></div>
+        <div class="field-group"><label>Company / Client</label><input value="${e.company}" placeholder="ABC Pvt Ltd" oninput="exps.find(x=>x.id==='${e.id}').company=this.value;render()"></div>
+      </div>
+      <div class="field-group"><label>Duration</label><input value="${e.duration}" placeholder="Jun 2024 – Aug 2024" oninput="exps.find(x=>x.id==='${e.id}').duration=this.value;render()"></div>
+      <div class="field-group"><label>Description</label><textarea rows="2" oninput="exps.find(x=>x.id==='${e.id}').desc=this.value;render()" placeholder="Worked on responsive UI components using React...">${e.desc}</textarea></div>
+    </div>`).join('');
+  updateProgress();
+}
+
+function render(){
+  const name=v('name')||'Your Name';
+  const phone=v('phone');const email=v('email');const linkedin=v('linkedin');const github=v('github');
+  const summary=v('summary');
+  const contactParts=[phone,email,linkedin&&`<a href="#">${linkedin}</a>`,github&&`<a href="#">${github}</a>`].filter(Boolean);
+
+  const skillRows=[
+    skills.lang.length?`<div class="rp-skill-cat"><strong>Languages:</strong> ${skills.lang.join(', ')}</div>`:'',
+    skills.web.length?`<div class="rp-skill-cat"><strong>Web:</strong> ${skills.web.join(', ')}</div>`:'',
+    skills.tools.length?`<div class="rp-skill-cat"><strong>Tools:</strong> ${skills.tools.join(', ')}</div>`:'',
+    skills.other.length?`<div class="rp-skill-cat"><strong>Other:</strong> ${skills.other.join(', ')}</div>`:''
+  ].filter(Boolean).join('');
+
+  const projHTML=projects.map(p=>`
+    <div class="rp-project">
+      <div class="rp-project-name">${p.name||'Project Name'}</div>
+      ${p.tech?`<div class="rp-project-tech">${p.tech}</div>`:''}
+      ${p.desc?`<div class="rp-project-desc">${p.desc}${p.contribution?' — '+p.contribution:''}</div>`:''}
+    </div>`).join('');
+
+  const eduHTML=edus.map(e=>`
+    <div class="rp-edu">
+      <div class="rp-row"><span style="font-weight:500">${e.degree||'Degree'}</span><span style="color:#888">${e.year||''}</span></div>
+      <div class="rp-sub">${e.college||'College'}${e.score?' · '+e.score:''}</div>
+    </div>`).join('');
+
+  const certHTML=certs.map(c=>`
+    <div class="rp-cert">
+      <span style="font-weight:500">${c.name||'Certification'}</span>
+      ${c.platform?` <span style="color:#888;font-size:11px">— ${c.platform}</span>`:''}
+      ${c.year?` <span style="color:#aaa;font-size:11px">(${c.year})</span>`:''}
+    </div>`).join('');
+
+  const expHTML=exps.map(e=>`
+    <div class="rp-exp">
+      <div class="rp-row"><span style="font-weight:500">${e.role||'Role'}</span><span style="color:#888">${e.duration||''}</span></div>
+      <div class="rp-sub" style="margin-bottom:2px">${e.company||'Company'}</div>
+      ${e.desc?`<div style="font-size:11px;color:#444">${e.desc}</div>`:''}
+    </div>`).join('');
+
+  document.getElementById('resume-preview').innerHTML=`
+    <div class="rp-name">${name}</div>
+    <div class="rp-contact">${contactParts.join(' · ')}</div>
+    ${summary?`<div class="rp-section"><div class="rp-section-title">Summary</div><div class="rp-summary">${summary}</div></div>`:''}
+    ${skillRows?`<div class="rp-section"><div class="rp-section-title">Skills</div><div class="rp-skills-grid">${skillRows}</div></div>`:''}
+    ${projHTML?`<div class="rp-section"><div class="rp-section-title">Projects</div>${projHTML}</div>`:''}
+    ${eduHTML?`<div class="rp-section"><div class="rp-section-title">Education</div>${eduHTML}</div>`:''}
+    ${certHTML?`<div class="rp-section"><div class="rp-section-title">Certifications</div>${certHTML}</div>`:''}
+    ${expHTML?`<div class="rp-section"><div class="rp-section-title">Experience</div>${expHTML}</div>`:''}
+  `;
+}
+
+function exportPDF(){
+  render();
+  const el=document.getElementById('resume-preview');
+  const name=v('name')||'resume';
+  html2pdf().set({margin:10,filename:name.replace(/\s+/g,'_')+'_resume.pdf',image:{type:'jpeg',quality:0.98},html2canvas:{scale:2},jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}}).from(el).save();
+}
+render();
+</script>
